@@ -1,0 +1,33 @@
+{
+  "title": "Inteligência Pragmática",
+  "tagline": "Ver o que é, decidir sem drama, fazer o que funciona.",
+  "parts": [
+    "Abertura",
+    "Parte I · Fundamento",
+    "Parte II · Pensar",
+    "Parte III · Decidir",
+    "Parte IV · Fazer",
+    "Parte V · Sustentar",
+    "Consulta rápida"
+  ],
+  "chapters": [
+    {"id": "00", "num": "0", "part": 0, "file": "00-como-usar.html", "title": "Como usar este livro", "sub": "Dez minutos por dia, um gatilho por vez."},
+    {"id": "01", "num": "1", "part": 1, "file": "01-o-que-e.html", "title": "O que é inteligência pragmática", "sub": "Ser inteligente e ser eficaz são coisas diferentes."},
+    {"id": "02", "num": "2", "part": 1, "file": "02-fato-suposicao-opiniao.html", "title": "Fato, suposição e opinião", "sub": "O mapa não é o território."},
+    {"id": "03", "num": "3", "part": 2, "file": "03-problema-de-verdade.html", "title": "Qual é o problema de verdade?", "sub": "Apaixone-se pelo problema, não pela solução."},
+    {"id": "04", "num": "4", "part": 2, "file": "04-vieses.html", "title": "Os vieses que custam dinheiro", "sub": "Seis erros previsíveis e o antídoto de cada um."},
+    {"id": "05", "num": "5", "part": 2, "file": "05-taxa-base-e-apostas.html", "title": "Taxa-base e apostas", "sub": "Pensar em probabilidade sem virar estatístico."},
+    {"id": "06", "num": "6", "part": 2, "file": "06-inversao-e-pre-mortem.html", "title": "Inversão e pré-mortem", "sub": "Evitar a burrice rende mais que buscar a genialidade."},
+    {"id": "07", "num": "7", "part": 3, "file": "07-portas.html", "title": "Portas de uma via e de duas vias", "sub": "A velocidade certa pra cada decisão."},
+    {"id": "08", "num": "8", "part": 3, "file": "08-bom-o-suficiente.html", "title": "Bom o suficiente", "sub": "Onde caprichar e onde soltar."},
+    {"id": "09", "num": "9", "part": 3, "file": "09-custos.html", "title": "Custo de oportunidade e custo afundado", "sub": "Todo sim é um não pra outra coisa."},
+    {"id": "10", "num": "10", "part": 4, "file": "10-menor-teste.html", "title": "O menor teste que ensina algo", "sub": "Trocar discussão por experimento barato."},
+    {"id": "11", "num": "11", "part": 4, "file": "11-gatilhos-se-entao.html", "title": "Gatilhos se-então", "sub": "Como automatizar o bom comportamento."},
+    {"id": "12", "num": "12", "part": 4, "file": "12-uma-coisa-de-cada-vez.html", "title": "Uma coisa de cada vez", "sub": "Foco é decidir o que fica parado."},
+    {"id": "13", "num": "13", "part": 4, "file": "13-checklists-rotinas-energia.html", "title": "Checklists, rotinas e energia", "sub": "Sistemas simples contra erro burro."},
+    {"id": "14", "num": "14", "part": 5, "file": "14-pragmatismo-com-gente.html", "title": "Pragmatismo com gente", "sub": "Negociar, delegar e dizer não."},
+    {"id": "15", "num": "15", "part": 5, "file": "15-diario-de-decisoes.html", "title": "Diário de decisões", "sub": "Separar decisão boa de sorte boa."},
+    {"id": "16", "num": "16", "part": 6, "file": "16-kit-de-bolso.html", "title": "Kit de bolso", "sub": "Todos os gatilhos e o plano de 30 dias."},
+    {"id": "17", "num": "17", "part": 6, "file": "17-tabelas.html", "title": "Tabelas de consulta", "sub": "Todas as tabelas do livro num lugar só."}
+  ]
+}
