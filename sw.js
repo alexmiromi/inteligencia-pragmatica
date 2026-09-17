@@ -20,7 +20,13 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(req, { ignoreSearch: true }).then((hit) => {
       if (hit) return hit;
-      return fetch(req).catch(() => (req.mode === 'navigate' ? caches.match('index.html') : Response.error()));
+      // repõe no cache o que vier da rede (outro app do mesmo domínio pode ter limpado os caches)
+      return fetch(req)
+        .then((res) => {
+          if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
+          return res;
+        })
+        .catch(() => (req.mode === 'navigate' ? caches.match('index.html') : Response.error()));
     })
   );
 });
