@@ -1,5 +1,5 @@
 /* Gerado por build.py. Edite src/sw.template.js. */
-const CACHE = 'ip-da3dd623e3';
+const CACHE = 'ip-9a2dda0919';
 const ASSETS = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {

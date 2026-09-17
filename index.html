@@ -27,6 +27,7 @@ document.documentElement.setAttribute('data-theme',t)})();
   --warn-bg:#fbe6e1;--warn-bd:#c8452f;--warn-t:#9a2e1c;
   --ex-bg:#e5eef8;--ex-bd:#3b78b8;--ex-t:#275a8e;
   --ask-bg:#efe9f7;--ask-bd:#7a5bb0;--ask-t:#5a3f8c;
+  --hl:#ffe58a;--hl-bd:#c99700;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --fs:18px;
@@ -40,6 +41,7 @@ document.documentElement.setAttribute('data-theme',t)})();
   --warn-bg:#2c1815;--warn-bd:#d0604a;--warn-t:#f09a88;
   --ex-bg:#14202d;--ex-bd:#4c8bcb;--ex-t:#8fbdea;
   --ask-bg:#1f1a2b;--ask-bd:#8d70c4;--ask-t:#bda6e6;
+  --hl:#57460f;--hl-bd:#e6bf5e;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--bar-h) + 12px)}
@@ -210,6 +212,83 @@ details.install li{margin:6px 0}
 @media (min-width:760px){:root{--fs:19px}.table-wrap{margin-left:0;margin-right:0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{#bar,#progress,.ch-end,#drawer,#scrim,.fav{display:none!important}main{padding-top:0}}
+/* ===== caderno: destaques, anotações, exportação ===== */
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:.08em 0;-webkit-box-decoration-break:clone;box-decoration-break:clone;cursor:pointer}
+mark.noted{box-shadow:inset 0 -2px 0 var(--hl-bd)}
+mark.flash{animation:flash 1.2s ease 2}
+@keyframes flash{50%{background:var(--accent);color:var(--accent-ink)}}
+
+.rd{display:none}
+body.reading .rd{display:grid}
+@media (max-width:480px){body.reading #b-theme{display:none}} /* no celular, lendo: tema fica no painel Aa */
+#b-mark[aria-pressed="true"]{background:var(--hl-bd);color:#1a120c}
+body.marking #content{-webkit-user-select:none;user-select:none}
+body.marking #content [data-b]{cursor:pointer}
+body.marking #bar{box-shadow:0 3px 0 var(--hl-bd)}
+
+#selbar{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:65;display:flex;
+  background:var(--ink);border-radius:14px;overflow:hidden;opacity:0;pointer-events:none;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#selbar.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#selbar button{color:var(--bg);padding:14px 18px;font-weight:650;font-size:15px;white-space:nowrap}
+#selbar button+button{border-left:1px solid rgba(128,128,128,.4)}
+
+#sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.5);display:flex;justify-content:center;align-items:flex-start;
+  padding:calc(12px + env(safe-area-inset-top)) 12px 12px}
+#sheet[hidden]{display:none}
+.sh-card{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);max-height:calc(100vh - 40px);overflow:auto}
+.sh-card h3{margin:0 0 10px;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+#sh-quote{margin:0 0 12px;padding:8px 12px;border-left:3px solid var(--hl-bd);background:var(--hl);border-radius:0 8px 8px 0;font-family:var(--serif);
+  font-size:15px;line-height:1.5;max-height:7.5em;overflow:auto;white-space:pre-wrap}
+textarea{width:100%;display:block;font:inherit;font-size:16px;line-height:1.5;color:var(--ink);background:var(--bg);border:1px solid var(--line);
+  border-radius:12px;padding:12px;resize:vertical;-webkit-appearance:none;appearance:none}
+textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.sh-idea{display:flex;align-items:center;gap:10px;margin:12px 2px;font-size:15px;font-weight:600}
+.sh-idea input{width:22px;height:22px;accent-color:var(--accent)}
+.sh-actions{display:flex;gap:8px;align-items:center}
+.sh-actions span{flex:1}
+.sh-actions button{min-height:46px;padding:0 16px;border-radius:12px;font-weight:650;font-size:15px;border:1px solid var(--line)}
+.sh-actions .primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+#sh-del{color:var(--warn-t);border-color:transparent;padding:0 8px}
+
+/* resposta do exercício */
+.exbox{margin:14px 0 4px;font-family:var(--sans)}
+.exbox label{display:block;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--accent);margin-bottom:6px}
+.exbox small{display:block;margin-top:6px;font-size:12px;color:var(--muted)}
+
+/* anotações no fim do capítulo e no caderno */
+#ch-notes{margin-top:34px}
+ul.notes{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
+.notes li{position:relative}
+.note-item{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.5}
+.note-item:active{background:var(--accent-soft)}
+.note-item .nt{display:block;white-space:pre-wrap;overflow-wrap:break-word}
+.note-item .q{display:block;white-space:pre-wrap;font-family:var(--serif);border-left:3px solid var(--hl-bd);padding-left:10px;margin-bottom:6px}
+.note-item .q+.tag{margin-top:2px}
+.note-item small{display:block;margin-top:6px;font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--tri-t);background:var(--tri-bg);
+  border-radius:99px;padding:2px 8px;margin:0 0 6px}
+.nb-hl .note-item{padding-bottom:34px}
+.goto{position:absolute;right:14px;bottom:10px;font-size:12.5px;color:var(--muted)}
+.nb-link{font-size:13.5px;color:var(--muted);margin:12px 2px 0}
+.nb-ex{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.5;margin-bottom:8px}
+.nb-ex small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--accent);margin-bottom:4px}
+.nb-ex p{margin:0;white-space:pre-wrap;overflow-wrap:break-word}
+.nb h1{font-size:clamp(30px,8vw,40px)}
+.nb .tagline{font-size:16px;font-style:normal;font-family:var(--sans);margin-bottom:18px}
+.nb .overall p{margin-top:0;line-height:1.5}
+.exp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.exp .btn{font-size:14.5px;min-height:48px;padding:8px 10px}
+.exp .primary{grid-column:1/-1}
+.nb-add{margin-top:14px;width:100%}
+h2.sec a{color:inherit;text-decoration:none}
+.nbcard{display:block;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.nbcard b{display:block;font-size:15px}
+.nbcard span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.dlink{display:block;margin:12px 4px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);
+  text-decoration:none;font-weight:650;font-size:14.5px}
+@media print{#selbar,#sheet,#ch-notes .btn{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -218,6 +297,8 @@ details.install li{margin:6px 0}
 <header id="bar">
   <button class="ib" id="b-menu" aria-label="Abrir sumário"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
   <div id="bar-label"><b>Inteligência Pragmática</b></div>
+  <button class="ib rd" id="b-mark" aria-label="Marcador: tocar num trecho pra destacar" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-9.5 9.5H6v-4.5z"/><path d="M4 21.5h16"/></svg></button>
+  <button class="ib rd" id="b-note" aria-label="Nova anotação"><svg viewBox="0 0 24 24"><path d="M5 4h14v11l-5 5H5z"/><path d="M14 20v-5h5"/><path d="M8.5 9h7M8.5 12.5h4"/></svg></button>
   <button class="ib txt" id="b-aa" aria-label="Tamanho da letra e tema" aria-expanded="false">Aa</button>
   <button class="ib" id="b-theme" aria-label="Alternar modo claro e escuro">
     <svg class="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
@@ -236,6 +317,14 @@ details.install li{margin:6px 0}
 <aside id="drawer" aria-label="Sumário" aria-hidden="true"></aside>
 
 <main id="app"><noscript>Este livro precisa de JavaScript ligado para funcionar.</noscript></main>
+<div id="selbar"><button id="sel-hl">Destacar</button><button id="sel-note">Destacar + nota</button></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title" hidden><div class="sh-card">
+  <h3 id="sh-title"></h3>
+  <div id="sh-quote" hidden></div>
+  <textarea id="sh-text" rows="5"></textarea>
+  <label class="sh-idea"><input type="checkbox" id="sh-idea"> Ideia pra aplicar na prática</label>
+  <div class="sh-actions"><button id="sh-del">Excluir</button><span></span><button id="sh-cancel">Cancelar</button><button id="sh-save" class="primary">Salvar</button></div>
+</div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <template id="ch-00">
@@ -270,6 +359,25 @@ details.install li{margin:6px 0}
 
 <div class="box ex"><span class="box-t">Na prática</span><p>Um exemplo inventado, quase sempre de loja online, dinheiro ou família. Nenhum é caso real.</p></div>
 
+<h2>Destacar, anotar e exportar</h2>
+<p>Ler sem anotar é assistir. O app tem um caderno embutido, e tudo fica salvo no seu aparelho.</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Pra fazer isto</th><th>Faça assim</th></tr></thead>
+<tbody>
+<tr><td>Destacar um trecho</td><td>Selecione o texto com o dedo e toque em "Destacar" na barra que aparece embaixo</td></tr>
+<tr><td>Destacar rápido</td><td>Ligue o marcador (lápis sublinhado, no topo) e toque nos parágrafos. Toque de novo pra tirar</td></tr>
+<tr><td>Anotar uma ideia</td><td>Botão de nota no topo, ou "Nova anotação" no fim do capítulo</td></tr>
+<tr><td>Separar o que vira ação</td><td>Marque "Ideia pra aplicar na prática" na anotação ou no destaque</td></tr>
+<tr><td>Responder o exercício</td><td>Campo "Minha resposta" no fim de cada capítulo. Salva sozinho</td></tr>
+<tr><td>Levar tudo pra fora</td><td>Meu caderno (na capa ou no menu), botão "Copiar tudo" ou "Salvar ou enviar arquivo"</td></tr>
+</tbody>
+</table></div>
+
+<p>A exportação sai como texto organizado por capítulo, com as ideias pra aplicar no topo em formato de lista de tarefas. Serve pra colar numa conversa com uma IA, num documento ou no seu sistema de tarefas, e transformar leitura em projeto.</p>
+
+<div class="box warn"><span class="box-t">Armadilha</span><p>As anotações moram só neste aparelho. Se você apagar o app ou limpar os dados do navegador, elas somem. De vez em quando, abra Meu caderno e toque em "Backup". O app instalado e o navegador guardam dados separados, então escolha um dos dois e fique nele.</p></div>
+
 <h2>Por que gatilho, e não conselho</h2>
 <p>Conselho é "pense melhor antes de decidir". Gatilho é "se a decisão custa mais que tal valor, então espero 24 horas". O primeiro depende de você lembrar, estar descansado e ter força de vontade na hora. O segundo já vem com a hora e a ação definidas.</p>
 <p>O capítulo 11 explica a pesquisa por trás desse formato. Por enquanto, a regra de uso é uma só: <strong>poucos gatilhos, usados de verdade</strong>. Três gatilhos rodando valem mais que quarenta favoritados.</p>
@@ -282,6 +390,7 @@ details.install li{margin:6px 0}
 <li><strong>Faça o exercício de 5 minutos</strong> do fim do capítulo antes de marcar como lido. Ele é a parte que funciona.</li>
 <li><strong>Escolha no máximo um gatilho por capítulo</strong> e marque com a estrela. Se nenhum servir, não marque nenhum.</li>
 <li><strong>Releia "Meus gatilhos" na capa</strong> toda manhã durante o primeiro mês. Leva um minuto.</li>
+<li><strong>Marque como "ideia pra aplicar"</strong> tudo que der vontade de testar na vida real. No fim da semana, exporte o caderno e transforme em ação.</li>
 <li><strong>No fim, vá pro kit de bolso</strong> (capítulo 16), que tem o plano de 30 dias.</li>
 </ol>
 
@@ -1653,6 +1762,17 @@ details.install li{margin:6px 0}
 <tr><td>Repito os mesmos erros</td><td>Capítulos 6 e 15</td></tr>
 </tbody>
 </table></div>
+<div class="table-wrap"><table>
+<thead><tr><th>Pra fazer isto</th><th>Faça assim</th></tr></thead>
+<tbody>
+<tr><td>Destacar um trecho</td><td>Selecione o texto com o dedo e toque em "Destacar" na barra que aparece embaixo</td></tr>
+<tr><td>Destacar rápido</td><td>Ligue o marcador (lápis sublinhado, no topo) e toque nos parágrafos. Toque de novo pra tirar</td></tr>
+<tr><td>Anotar uma ideia</td><td>Botão de nota no topo, ou "Nova anotação" no fim do capítulo</td></tr>
+<tr><td>Separar o que vira ação</td><td>Marque "Ideia pra aplicar na prática" na anotação ou no destaque</td></tr>
+<tr><td>Responder o exercício</td><td>Campo "Minha resposta" no fim de cada capítulo. Salva sozinho</td></tr>
+<tr><td>Levar tudo pra fora</td><td>Meu caderno (na capa ou no menu), botão "Copiar tudo" ou "Salvar ou enviar arquivo"</td></tr>
+</tbody>
+</table></div>
 <p class="kit-src"><a href="#/c/00">Ver no contexto do capítulo 0</a></p>
 <h2>1 · O que é inteligência pragmática</h2>
 <div class="table-wrap"><table>
@@ -1905,13 +2025,14 @@ details.install li{margin:6px 0}
 <script>
 (function(){
 'use strict';
-var BOOK={"title": "Inteligência Pragmática", "tagline": "Ver o que é, decidir sem drama, fazer o que funciona.", "parts": ["Abertura", "Parte I · Fundamento", "Parte II · Pensar", "Parte III · Decidir", "Parte IV · Fazer", "Parte V · Sustentar", "Consulta rápida"], "chapters": [{"id": "00", "num": "0", "part": 0, "title": "Como usar este livro", "sub": "Dez minutos por dia, um gatilho por vez.", "min": 4}, {"id": "01", "num": "1", "part": 1, "title": "O que é inteligência pragmática", "sub": "Ser inteligente e ser eficaz são coisas diferentes.", "min": 8}, {"id": "02", "num": "2", "part": 1, "title": "Fato, suposição e opinião", "sub": "O mapa não é o território.", "min": 8}, {"id": "03", "num": "3", "part": 2, "title": "Qual é o problema de verdade?", "sub": "Apaixone-se pelo problema, não pela solução.", "min": 8}, {"id": "04", "num": "4", "part": 2, "title": "Os vieses que custam dinheiro", "sub": "Seis erros previsíveis e o antídoto de cada um.", "min": 8}, {"id": "05", "num": "5", "part": 2, "title": "Taxa-base e apostas", "sub": "Pensar em probabilidade sem virar estatístico.", "min": 9}, {"id": "06", "num": "6", "part": 2, "title": "Inversão e pré-mortem", "sub": "Evitar a burrice rende mais que buscar a genialidade.", "min": 8}, {"id": "07", "num": "7", "part": 3, "title": "Portas de uma via e de duas vias", "sub": "A velocidade certa pra cada decisão.", "min": 8}, {"id": "08", "num": "8", "part": 3, "title": "Bom o suficiente", "sub": "Onde caprichar e onde soltar.", "min": 8}, {"id": "09", "num": "9", "part": 3, "title": "Custo de oportunidade e custo afundado", "sub": "Todo sim é um não pra outra coisa.", "min": 9}, {"id": "10", "num": "10", "part": 4, "title": "O menor teste que ensina algo", "sub": "Trocar discussão por experimento barato.", "min": 8}, {"id": "11", "num": "11", "part": 4, "title": "Gatilhos se-então", "sub": "Como automatizar o bom comportamento.", "min": 9}, {"id": "12", "num": "12", "part": 4, "title": "Uma coisa de cada vez", "sub": "Foco é decidir o que fica parado.", "min": 9}, {"id": "13", "num": "13", "part": 4, "title": "Checklists, rotinas e energia", "sub": "Sistemas simples contra erro burro.", "min": 9}, {"id": "14", "num": "14", "part": 5, "title": "Pragmatismo com gente", "sub": "Negociar, delegar e dizer não.", "min": 9}, {"id": "15", "num": "15", "part": 5, "title": "Diário de decisões", "sub": "Separar decisão boa de sorte boa.", "min": 9}, {"id": "16", "num": "16", "part": 6, "title": "Kit de bolso", "sub": "Todos os gatilhos e o plano de 30 dias.", "min": 15}, {"id": "17", "num": "17", "part": 6, "title": "Tabelas de consulta", "sub": "Todas as tabelas do livro num lugar só.", "min": 13}]};
+var BOOK={"title": "Inteligência Pragmática", "tagline": "Ver o que é, decidir sem drama, fazer o que funciona.", "parts": ["Abertura", "Parte I · Fundamento", "Parte II · Pensar", "Parte III · Decidir", "Parte IV · Fazer", "Parte V · Sustentar", "Consulta rápida"], "chapters": [{"id": "00", "num": "0", "part": 0, "title": "Como usar este livro", "sub": "Dez minutos por dia, um gatilho por vez.", "min": 6}, {"id": "01", "num": "1", "part": 1, "title": "O que é inteligência pragmática", "sub": "Ser inteligente e ser eficaz são coisas diferentes.", "min": 8}, {"id": "02", "num": "2", "part": 1, "title": "Fato, suposição e opinião", "sub": "O mapa não é o território.", "min": 8}, {"id": "03", "num": "3", "part": 2, "title": "Qual é o problema de verdade?", "sub": "Apaixone-se pelo problema, não pela solução.", "min": 8}, {"id": "04", "num": "4", "part": 2, "title": "Os vieses que custam dinheiro", "sub": "Seis erros previsíveis e o antídoto de cada um.", "min": 8}, {"id": "05", "num": "5", "part": 2, "title": "Taxa-base e apostas", "sub": "Pensar em probabilidade sem virar estatístico.", "min": 9}, {"id": "06", "num": "6", "part": 2, "title": "Inversão e pré-mortem", "sub": "Evitar a burrice rende mais que buscar a genialidade.", "min": 8}, {"id": "07", "num": "7", "part": 3, "title": "Portas de uma via e de duas vias", "sub": "A velocidade certa pra cada decisão.", "min": 8}, {"id": "08", "num": "8", "part": 3, "title": "Bom o suficiente", "sub": "Onde caprichar e onde soltar.", "min": 8}, {"id": "09", "num": "9", "part": 3, "title": "Custo de oportunidade e custo afundado", "sub": "Todo sim é um não pra outra coisa.", "min": 9}, {"id": "10", "num": "10", "part": 4, "title": "O menor teste que ensina algo", "sub": "Trocar discussão por experimento barato.", "min": 8}, {"id": "11", "num": "11", "part": 4, "title": "Gatilhos se-então", "sub": "Como automatizar o bom comportamento.", "min": 9}, {"id": "12", "num": "12", "part": 4, "title": "Uma coisa de cada vez", "sub": "Foco é decidir o que fica parado.", "min": 9}, {"id": "13", "num": "13", "part": 4, "title": "Checklists, rotinas e energia", "sub": "Sistemas simples contra erro burro.", "min": 9}, {"id": "14", "num": "14", "part": 5, "title": "Pragmatismo com gente", "sub": "Negociar, delegar e dizer não.", "min": 9}, {"id": "15", "num": "15", "part": 5, "title": "Diário de decisões", "sub": "Separar decisão boa de sorte boa.", "min": 9}, {"id": "16", "num": "16", "part": 6, "title": "Kit de bolso", "sub": "Todos os gatilhos e o plano de 30 dias.", "min": 15}, {"id": "17", "num": "17", "part": 6, "title": "Tabelas de consulta", "sub": "Todas as tabelas do livro num lugar só.", "min": 14}]};
 var CH=BOOK.chapters, PARTS=BOOK.parts;
 var LS='ip.state.v1';
 var FS=[16,17,18,19.5,21,23];
 var S=load();
-function load(){var d={read:{},pos:{},last:null,theme:'auto',fs:2,fav:{}};
-  try{var o=JSON.parse(localStorage.getItem(LS)||'{}');for(var k in o)d[k]=o[k]}catch(e){}return d}
+function load(){var d={read:{},pos:{},last:null,theme:'auto',fs:2,fav:{},notes:[],hl:[],ex:{}};
+  try{var o=JSON.parse(localStorage.getItem(LS)||'{}');for(var k in o)d[k]=o[k]}catch(e){}
+  if(!Array.isArray(d.notes))d.notes=[];if(!Array.isArray(d.hl))d.hl=[];if(!d.ex||typeof d.ex!=='object')d.ex={};return d}
 function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 var $=function(s,r){return (r||document).querySelector(s)};
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
@@ -1919,7 +2040,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;
 var app=$('#app'),bar=$('#bar-label'),prog=$('#progress span'),drawer=$('#drawer');
 var CHECK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 var STAR='<svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8z"/></svg>';
-var cur=null,openedAt=0,io=null;
+var cur=null,openedAt=0,io=null,view='home',marking=false;
 
 /* índice de gatilhos (texto por id) */
 var TRIG={};
@@ -1963,13 +2084,14 @@ function setRead(id,v,quiet){if(v)S.read[id]=Date.now();else delete S.read[id];s
   if(!quiet){var s=stats();toast(v?'Capítulo concluído · '+s.n+' de '+s.total:'Desmarcado')}}
 function bindToc(root){root.addEventListener('click',function(e){var b=e.target.closest('.chk');if(!b)return;
   var id=b.parentNode.getAttribute('data-id');setRead(id,!S.read[id]);refresh()})}
-function refresh(){if(cur===null)renderHome(true);else{var d=$('.done');if(d)paintDone(d)}
+function refresh(){if(view==='home')renderHome(true);else if(view==='nb')renderNotebook(true);else{var d=$('.done');if(d)paintDone(d)}
   if(document.body.classList.contains('drawer-open'))renderDrawer()}
 
 /* gaveta */
 function renderDrawer(){var s=stats();
   drawer.innerHTML='<header><a href="#/">Inteligência Pragmática</a><button class="ib" id="d-close" aria-label="Fechar sumário"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>'+
   '<div class="dmeter"><div class="meter"><span style="width:'+s.pct+'%"></span></div>'+s.n+' de '+s.total+' capítulos · '+s.pct+'%</div>'+
+  '<a class="dlink" href="#/notas">Meu caderno · anotações e exportação</a>'+
   '<nav class="toc">'+tocHTML()+'</nav>';
   $('#d-close').onclick=closeDrawer}
 function openDrawer(){renderDrawer();document.body.classList.add('drawer-open');drawer.setAttribute('aria-hidden','false');
@@ -1978,8 +2100,8 @@ function closeDrawer(){document.body.classList.remove('drawer-open');drawer.setA
 $('#b-menu').onclick=openDrawer;$('#scrim').onclick=closeDrawer;bindToc(drawer);
 drawer.addEventListener('click',function(e){if(e.target.closest('a'))closeDrawer()});
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeDrawer();aa.classList.remove('open')}
-  if(cur!==null&&!e.metaKey&&!e.ctrlKey&&!e.altKey){var i=idx(cur);
+  if(e.key==='Escape'){closeDrawer();aa.classList.remove('open');if(sheetOpen)closeSheet()}
+  if(cur!==null&&!sheetOpen&&!/TEXTAREA|INPUT/.test(e.target.tagName)&&!e.metaKey&&!e.ctrlKey&&!e.altKey){var i=idx(cur);
     if(e.key==='ArrowRight'&&CH[i+1])location.hash='#/c/'+CH[i+1].id;
     if(e.key==='ArrowLeft'&&CH[i-1])location.hash='#/c/'+CH[i-1].id}});
 
@@ -1988,7 +2110,7 @@ function favsHTML(){var ks=Object.keys(S.fav).filter(function(k){return TRIG[k]}
   if(!ks.length)return '<p class="empty">Toque na estrela de um gatilho durante a leitura e ele aparece aqui, pra você reler todo dia.</p>';
   return '<div class="favs">'+ks.map(function(k){var c=CH[idx(TRIG[k].ch)];
     return '<div class="box trigger" data-tid="'+k+'"><p>'+TRIG[k].html+'</p><span class="from"><a href="#/c/'+c.id+'">Cap. '+esc(c.num)+' · '+esc(c.title)+'</a></span></div>'}).join('')+'</div>'}
-function renderHome(keep){cur=null;var s=stats(),y=window.scrollY;
+function renderHome(keep){cur=null;view='home';document.body.classList.remove('reading');setMarking(false);var s=stats(),nc=counts(),y=window.scrollY;
   var nxt=null;if(S.last&&!S.read[S.last]&&idx(S.last)>=0)nxt=CH[idx(S.last)];
   if(!nxt)nxt=CH.filter(function(c){return !S.read[c.id]})[0]||null;
   var started=s.n>0||S.last;
@@ -1998,44 +2120,47 @@ function renderHome(keep){cur=null;var s=stats(),y=window.scrollY;
     '<p class="tagline">'+esc(BOOK.tagline)+'</p>'+
     '<div class="overall"><div class="meter"><span style="width:'+s.pct+'%"></span></div><p><b>'+s.n+' de '+s.total+'</b> capítulos lidos · '+s.pct+'%'+(s.left?' · faltam ~'+mins(s.left):'')+'</p>'+cta+'</div></section>'+
     '<h2 class="sec">Meus gatilhos</h2>'+favsHTML()+
+    '<h2 class="sec">Meu caderno</h2><a class="nbcard" href="#/notas"><b>'+plural(nc.hl,'destaque','destaques')+' · '+plural(nc.notes,'anotação','anotações')+' · '+plural(nc.ideas,'ideia pra aplicar','ideias pra aplicar')+'</b><span>Abrir, revisar e exportar →</span></a>'+
     '<nav class="toc" id="home-toc">'+tocHTML()+'</nav>'+
     '<details class="install"><summary>Instalar como app no celular</summary><ol>'+
     '<li><b>iPhone (Safari):</b> botão Compartilhar, depois "Adicionar à Tela de Início".</li>'+
     '<li><b>Android (Chrome):</b> menu de três pontos, depois "Instalar app" ou "Adicionar à tela inicial".</li>'+
-    '<li>Depois de aberto uma vez, o livro funciona sem internet. Seu progresso fica salvo neste aparelho.</li></ol></details>'+
+    '<li>Depois de aberto uma vez, o livro funciona sem internet. Progresso, destaques e anotações ficam salvos só neste aparelho (o app instalado e o navegador guardam separado). Faça backup pelo Meu caderno.</li></ol></details>'+
     '<p class="foot">Texto original, escrito com IA e revisado. Conceitos creditados aos autores citados.<br><button id="reset">Zerar meu progresso</button></p>';
   bindToc($('#home-toc'));
   var rb=$('#reset'),armed=false;rb.onclick=function(){if(!armed){armed=true;rb.textContent='Toque de novo pra confirmar';setTimeout(function(){armed=false;rb.textContent='Zerar meu progresso'},4000);return}
-    S.read={};S.pos={};S.last=null;save();renderHome();toast('Progresso zerado')};
+    S.read={};S.pos={};S.last=null;save();renderHome();toast('Progresso zerado. Anotações e destaques foram mantidos.')};
   bar.innerHTML='<b>Inteligência Pragmática</b>';document.title='Inteligência Pragmática';prog.style.width='0';
   document.body.classList.remove('bar-hidden');
   window.scrollTo(0,keep?y:0)}
 
 /* capítulo */
 function paintDone(b){var r=!!S.read[cur];b.setAttribute('aria-pressed',String(r));b.innerHTML=r?'✓ Lido <small>· toque pra desmarcar</small>':'Marcar capítulo como lido'}
-function renderChapter(id){var i=idx(id);if(i<0){location.replace('#/');return}
-  var c=CH[i],tpl=document.getElementById('ch-'+id);cur=id;openedAt=Date.now();S.last=id;save();
+function renderChapter(id,focusH){var i=idx(id);if(i<0){location.replace('#/');return}
+  var c=CH[i],tpl=document.getElementById('ch-'+id);cur=id;view='ch';document.body.classList.add('reading');openedAt=Date.now();S.last=id;save();
   var prev=CH[i-1],next=CH[i+1];
   app.innerHTML='<header class="ch-head"><p class="eyebrow">'+esc(PARTS[c.part])+'</p><h1>'+esc(c.title)+'</h1>'+
     (c.sub?'<p class="sub">'+esc(c.sub)+'</p>':'')+
     '<p class="meta"><span>Capítulo '+esc(c.num)+' · '+mins(c.min)+' de leitura</span>'+(S.read[id]?'<span class="pill">✓ lido</span>':'')+'</p></header>'+
-    '<article id="content"></article>'+
+    '<article id="content"></article><section id="ch-notes"></section>'+
     '<footer class="ch-end"><button class="btn done"></button><div class="pn">'+
     (prev?'<a class="btn" href="#/c/'+prev.id+'"><small>← Anterior</small>'+esc(prev.title)+'</a>':'<span class="ph"></span>')+
     (next?'<a class="btn next" href="#/c/'+next.id+'"><small>Próximo →</small>'+esc(next.title)+'</a>':'<a class="btn next" href="#/"><small>Fim →</small>Voltar à capa</a>')+
     '</div></footer>';
-  var art=$('#content');art.appendChild(tpl.content.cloneNode(true));
+  var art=$('#content');art.appendChild(tpl.content.cloneNode(true));indexBlocks(art);
   $$('.box.trigger[data-tid]',art).forEach(function(b){var k=b.getAttribute('data-tid'),btn=document.createElement('button');
     btn.className='fav';btn.innerHTML=STAR;btn.setAttribute('aria-label','Salvar em Meus gatilhos');btn.setAttribute('aria-pressed',String(!!S.fav[k]));
     btn.onclick=function(){if(S.fav[k])delete S.fav[k];else S.fav[k]=1;save();
       $$('.box.trigger[data-tid="'+k+'"] .fav',art).forEach(function(x){x.setAttribute('aria-pressed',String(!!S.fav[k]))});
       toast(S.fav[k]?'Salvo em Meus gatilhos (na capa)':'Removido de Meus gatilhos')};
     b.appendChild(btn)});
+  chapterExtras(art,id);
   var d=$('.done');paintDone(d);d.onclick=function(){setRead(id,!S.read[id]);paintDone(d)};
   document.title=c.title+' · Inteligência Pragmática';
   window.scrollTo(0,0);
-  var p=S.pos[id]||0;
-  if(p>.03&&p<.97)requestAnimationFrame(function(){requestAnimationFrame(function(){window.scrollTo(0,p*maxScroll())})});
+  var p=S.pos[id]||0,fm=focusH?$('mark[data-h="'+focusH+'"]',art):null;
+  if(fm)setTimeout(function(){fm.scrollIntoView({block:'center'});$$('mark[data-h="'+focusH+'"]',art).forEach(function(m){m.classList.add('flash')})},60);
+  else if(p>.03&&p<.97)requestAnimationFrame(function(){requestAnimationFrame(function(){window.scrollTo(0,p*maxScroll())})});
   if(io)io.disconnect();
   if('IntersectionObserver' in window){io=new IntersectionObserver(function(es){es.forEach(function(e){
     if(e.isIntersecting&&cur===id&&!S.read[id]&&Date.now()-openedAt>40000){setRead(id,true);paintDone(d)}})},{threshold:.6});io.observe(d)}
@@ -2050,13 +2175,202 @@ function onScroll(){tick=false;var y=window.scrollY;
     var c=CH[idx(cur)],left=Math.ceil(c.min*(1-r));
     bar.innerHTML='<b>'+esc(c.num)+' · '+esc(c.title)+'</b> · '+(r>=.995?'fim':Math.round(r*100)+'% · '+left+' min');
     S.pos[cur]=Math.max(0,Math.min(1,y/maxScroll()));clearTimeout(sv);sv=setTimeout(save,350);
-    if(y>lastY+6&&y>140)document.body.classList.add('bar-hidden');else if(y<lastY-6||y<140)document.body.classList.remove('bar-hidden')}
+    if(!marking&&y>lastY+6&&y>140)document.body.classList.add('bar-hidden');else if(y<lastY-6||y<140)document.body.classList.remove('bar-hidden')}
   lastY=y}
 window.addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});
 window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',function(){if(document.hidden)save()});
 
+/* ===== caderno: destaques, anotações, exportação (incluído dentro do IIFE do shell pelo build.py) ===== */
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function findNote(id){for(var i=0;i<S.notes.length;i++)if(S.notes[i].id===id)return S.notes[i];return null}
+function findHL(id){for(var i=0;i<S.hl.length;i++)if(S.hl[i].id===id)return S.hl[i];return null}
+function hlText(h){return h.parts.map(function(p){return p.t}).join('\n')}
+function chName(id){var i=idx(id);return i<0?'Geral':'Cap. '+CH[i].num+' · '+CH[i].title}
+function plain(html){var d=document.createElement('div');d.innerHTML=html;return d.textContent}
+function fmtDate(ts){var d=new Date(ts);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)}
+function grow(ta){ta.style.height='auto';ta.style.height=(ta.scrollHeight+2)+'px'}
+function counts(){return{hl:S.hl.length,notes:S.notes.length,ex:Object.keys(S.ex).length,
+  ideas:S.notes.filter(function(n){return n.idea}).length+S.hl.filter(function(h){return h.idea}).length}}
+function plural(n,one,many){return n+' '+(n===1?one:many)}
+
+/* --- blocos e destaques --- */
+function indexBlocks(art){var i=0;$$('p,li,td,h2,h3',art).forEach(function(el){el.setAttribute('data-b',i++)})}
+function clearMarks(art){$$('mark[data-h]',art).forEach(function(m){var p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()})}
+function wrap(el,s,e,id,noted){var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),n,pos=0,todo=[];
+  while((n=w.nextNode())){var len=n.nodeValue.length,a=Math.max(s,pos),z=Math.min(e,pos+len);if(a<z)todo.push([n,a-pos,z-pos]);pos+=len}
+  todo.forEach(function(t){var r=document.createRange();r.setStart(t[0],t[1]);r.setEnd(t[0],t[2]);
+    var m=document.createElement('mark');m.setAttribute('data-h',id);if(noted)m.className='noted';r.surroundContents(m)})}
+function applyHL(){var art=$('#content');if(!art)return;clearMarks(art);var all=$$('[data-b]',art);
+  S.hl.filter(function(h){return h.ch===cur}).forEach(function(h){h.parts.forEach(function(p){
+    var el=all[p.b];
+    if(!el||el.textContent.slice(p.s,p.e)!==p.t){el=null; /* texto do capítulo mudou: procura o trecho de novo */
+      for(var i=0;i<all.length;i++){var k=all[i].textContent.indexOf(p.t);if(k>=0){el=all[i];p.b=i;p.s=k;p.e=k+p.t.length;break}}}
+    if(el)wrap(el,p.s,p.e,h.id,!!h.note)})})}
+function partsFromRange(range){var parts=[];
+  $$('#content [data-b]').forEach(function(el){if(!range.intersectsNode(el))return;
+    var full=el.textContent,s=0,e=full.length,r;
+    if(el.contains(range.startContainer)){r=document.createRange();r.selectNodeContents(el);r.setEnd(range.startContainer,range.startOffset);s=r.toString().length}
+    if(el.contains(range.endContainer)){r=document.createRange();r.selectNodeContents(el);r.setEnd(range.endContainer,range.endOffset);e=r.toString().length}
+    while(s<e&&/\s/.test(full.charAt(s)))s++;while(e>s&&/\s/.test(full.charAt(e-1)))e--;
+    if(e>s)parts.push({b:+el.getAttribute('data-b'),s:s,e:e,t:full.slice(s,e)})});
+  return parts}
+function addHL(parts){if(!parts.length)return null;var h={id:uid(),ch:cur,parts:parts,note:'',idea:false,ts:Date.now()};
+  S.hl.push(h);save();applyHL();renderChNotes();return h}
+function removeHL(id){S.hl=S.hl.filter(function(h){return h.id!==id});save()}
+
+/* --- modo marcador (toque no trecho) --- */
+function setMarking(v){marking=!!v;document.body.classList.toggle('marking',marking);var b=$('#b-mark');if(b)b.setAttribute('aria-pressed',String(marking));
+  if(marking)document.body.classList.remove('bar-hidden')}
+$('#b-mark').onclick=function(){setMarking(!marking);toast(marking?'Marcador ligado: toque num trecho pra destacar ou tirar o destaque':'Marcador desligado')};
+$('#b-note').onclick=function(){openSheet({kind:'new',ch:cur,sec:currentSec()})};
+function currentSec(){var mid=window.innerHeight*.5,s='';$$('#content h2').forEach(function(h){if(h.getBoundingClientRect().top<mid)s=h.textContent});return s}
+
+/* --- seleção de texto --- */
+var selbar=$('#selbar'),lastRange=null,selT,actT=0;
+document.addEventListener('selectionchange',function(){clearTimeout(selT);selT=setTimeout(function(){
+  var sel=window.getSelection(),art=$('#content'),ok=false;
+  if(view==='ch'&&art&&!sheetOpen&&!marking&&sel&&sel.rangeCount&&!sel.isCollapsed&&sel.toString().trim().length>1){
+    var r=sel.getRangeAt(0);if(art.contains(r.startContainer)||art.contains(r.endContainer)){lastRange=r.cloneRange();ok=true}}
+  selbar.classList.toggle('show',ok)},180)});
+function selAction(withNote){var now=Date.now();if(now-actT<500)return;actT=now;if(!lastRange)return;
+  var h=addHL(partsFromRange(lastRange));lastRange=null;selbar.classList.remove('show');
+  var sel=window.getSelection();if(sel)sel.removeAllRanges();
+  if(!h){toast('Não deu pra destacar esse trecho');return}
+  if(withNote)openSheet({kind:'hl',id:h.id,focus:true});else toast('Destaque salvo')}
+[['#sel-hl',false],['#sel-note',true]].forEach(function(p){var b=$(p[0]);
+  b.addEventListener('pointerdown',function(e){e.preventDefault();selAction(p[1])});
+  b.addEventListener('click',function(){selAction(p[1])})});
+
+/* --- janela de anotação --- */
+var sheet=$('#sheet'),shCtx=null,sheetOpen=false;
+function openSheet(ctx){var t=$('#sh-text'),q=$('#sh-quote'),idea=$('#sh-idea'),del=$('#sh-del'),title=$('#sh-title'),o;
+  if(ctx.kind==='note'){o=findNote(ctx.id);if(!o)return}
+  if(ctx.kind==='hl'){o=findHL(ctx.id);if(!o)return}
+  shCtx=ctx;sheetOpen=true;selbar.classList.remove('show');q.hidden=true;del.hidden=false;del.textContent='Excluir';
+  if(ctx.kind==='new'){title.textContent='Nova anotação · '+chName(ctx.ch);t.value='';idea.checked=false;del.hidden=true}
+  else if(ctx.kind==='note'){title.textContent='Anotação · '+chName(o.ch);t.value=o.text;idea.checked=!!o.idea}
+  else{title.textContent='Destaque · '+chName(o.ch);q.hidden=false;q.textContent=hlText(o);t.value=o.note||'';idea.checked=!!o.idea;del.textContent='Remover destaque'}
+  t.placeholder=ctx.kind==='hl'?'Nota sobre este trecho (opcional)':'O que você pensou? Onde dá pra aplicar?';
+  sheet.hidden=false;if(ctx.kind!=='hl'||ctx.focus)t.focus()}
+function closeSheet(){sheet.hidden=true;sheetOpen=false;shCtx=null}
+function changed(){if(view==='ch'){applyHL();renderChNotes()}else if(view==='nb')renderNotebook(true);else if(view==='home')renderHome(true)}
+$('#sh-cancel').onclick=closeSheet;
+$('#sh-save').onclick=function(){var c=shCtx,v=$('#sh-text').value.trim(),idea=$('#sh-idea').checked,o;if(!c)return;
+  if(c.kind==='new'){if(v)S.notes.push({id:uid(),ch:c.ch||'',sec:c.sec||'',text:v,idea:idea,ts:Date.now()})}
+  else if(c.kind==='note'){o=findNote(c.id);if(o){if(v){o.text=v;o.idea=idea}else S.notes=S.notes.filter(function(n){return n.id!==c.id})}}
+  else{o=findHL(c.id);if(o){o.note=v;o.idea=idea}}
+  save();closeSheet();changed();if(v||c.kind==='hl')toast('Salvo neste aparelho')};
+$('#sh-del').onclick=function(){var c=shCtx;if(!c)return;
+  if(c.kind==='note')S.notes=S.notes.filter(function(n){return n.id!==c.id});
+  if(c.kind==='hl')removeHL(c.id);
+  save();closeSheet();changed();toast(c.kind==='hl'?'Destaque removido':'Anotação excluída')};
+
+/* --- extras do capítulo: resposta do exercício, anotações, cliques --- */
+function noteItemHTML(n,withCh){return '<li><button class="note-item" data-note="'+esc(n.id)+'">'+(n.idea?'<span class="tag">aplicar</span>':'')+
+  '<span class="nt">'+esc(n.text)+'</span><small>'+fmtDate(n.ts)+(withCh?' · '+esc(chName(n.ch)):'')+(n.sec?' · '+esc(n.sec):'')+'</small></button></li>'}
+function hlItemHTML(h,withCh){return '<li class="nb-hl"><button class="note-item" data-hl="'+esc(h.id)+'"><span class="q">'+esc(hlText(h))+'</span>'+
+  (h.idea?'<span class="tag">aplicar</span>':'')+(h.note?'<span class="nt">'+esc(h.note)+'</span>':'')+
+  '<small>'+fmtDate(h.ts)+(withCh?' · '+esc(chName(h.ch)):'')+'</small></button><a class="goto" href="#/c/'+esc(h.ch)+'?h='+esc(h.id)+'">ver no texto</a></li>'}
+function bindItems(root){
+  $$('[data-note]',root).forEach(function(b){b.onclick=function(){openSheet({kind:'note',id:b.getAttribute('data-note')})}});
+  $$('[data-hl]',root).forEach(function(b){b.onclick=function(){openSheet({kind:'hl',id:b.getAttribute('data-hl')})}})}
+function renderChNotes(){var box=$('#ch-notes');if(!box||view!=='ch')return;
+  var ns=S.notes.filter(function(n){return n.ch===cur}),hs=S.hl.filter(function(h){return h.ch===cur});
+  box.innerHTML='<h2 class="sec">Minhas anotações deste capítulo</h2>'+
+    (ns.length?'<ul class="notes">'+ns.map(function(n){return noteItemHTML(n)}).join('')+'</ul>'
+      :'<p class="empty" style="margin-bottom:12px">Nenhuma anotação ainda. Pra destacar, selecione um trecho do texto ou ligue o marcador lá em cima.</p>')+
+    '<button class="btn" id="add-note" style="width:100%">+ Nova anotação</button>'+
+    '<p class="nb-link">'+plural(hs.length,'destaque','destaques')+' neste capítulo · <a href="#/notas">abrir meu caderno</a></p>';
+  $('#add-note').onclick=function(){openSheet({kind:'new',ch:cur,sec:''})};bindItems(box)}
+function chapterExtras(art,id){var rc=$('.recap',art);
+  if(rc){var w=document.createElement('div');w.className='exbox';
+    w.innerHTML='<label for="ex-t">Minha resposta ao exercício</label><textarea id="ex-t" rows="3" placeholder="Escreva aqui. Salva sozinho."></textarea><small>Fica salvo neste aparelho e sai na exportação do caderno.</small>';
+    rc.appendChild(w);var ta=$('textarea',w);ta.value=S.ex[id]||'';grow(ta);
+    ta.oninput=function(){if(ta.value.trim())S.ex[id]=ta.value;else delete S.ex[id];grow(ta);clearTimeout(sv);sv=setTimeout(save,400)}}
+  applyHL();renderChNotes();
+  art.addEventListener('click',function(e){if(e.target.closest('a,button,textarea,input,label'))return;
+    var m=e.target.closest('mark[data-h]');
+    if(marking){var b=e.target.closest('[data-b]');
+      if(m){removeHL(m.getAttribute('data-h'));applyHL();renderChNotes();toast('Destaque removido');return}
+      if(b){var full=b.textContent,s=0,en=full.length;while(s<en&&/\s/.test(full.charAt(s)))s++;while(en>s&&/\s/.test(full.charAt(en-1)))en--;
+        if(en>s){addHL([{b:+b.getAttribute('data-b'),s:s,e:en,t:full.slice(s,en)}]);toast('Destaque salvo')}}
+      return}
+    if(m){var sel=window.getSelection();if(sel&&!sel.isCollapsed)return;openSheet({kind:'hl',id:m.getAttribute('data-h')})}})}
+
+/* --- exportação --- */
+function exportMD(){var s=stats(),c=counts(),L=[],ideasN=S.notes.filter(function(n){return n.idea}),ideasH=S.hl.filter(function(h){return h.idea});
+  L.push('# Caderno de leitura: Inteligência Pragmática','');
+  L.push('Exportado em '+new Date().toLocaleDateString('pt-BR')+' · '+s.n+' de '+s.total+' capítulos lidos · '+plural(c.hl,'destaque','destaques')+' · '+plural(c.notes,'anotação','anotações')+' · '+plural(c.ideas,'ideia pra aplicar','ideias pra aplicar'),'');
+  L.push('Contexto pra quem for ler: são minhas anotações do livro. O objetivo é transformar as ideias marcadas em aplicação prática.','');
+  if(ideasN.length||ideasH.length){L.push('## Ideias pra aplicar na prática','');
+    ideasN.forEach(function(n){L.push('- [ ] '+n.text.replace(/\n+/g,' ')+' ('+chName(n.ch)+(n.sec?', seção: '+n.sec:'')+')')});
+    ideasH.forEach(function(h){L.push('- [ ] '+(h.note?h.note.replace(/\n+/g,' ')+' | ':'')+'trecho: "'+hlText(h).replace(/\n+/g,' ')+'" ('+chName(h.ch)+')')});L.push('')}
+  var favs=Object.keys(S.fav).filter(function(k){return TRIG[k]}).sort();
+  if(favs.length){L.push('## Meus gatilhos favoritos','');favs.forEach(function(k){L.push('- '+plain(TRIG[k].html).trim()+' ('+chName(TRIG[k].ch)+')')});L.push('')}
+  [''].concat(CH.map(function(x){return x.id})).forEach(function(id){
+    var hs=S.hl.filter(function(h){return (h.ch||'')===id}),ns=S.notes.filter(function(n){return (n.ch||'')===id}),ex=id&&S.ex[id];
+    if(!hs.length&&!ns.length&&!ex)return;
+    L.push('## '+chName(id),'');
+    if(hs.length){L.push('### Destaques','');hs.forEach(function(h){hlText(h).split('\n').forEach(function(l){L.push('> '+l)});
+      if(h.note)L.push('','Nota'+(h.idea?' (aplicar)':'')+': '+h.note);L.push('')})}
+    if(ns.length){L.push('### Anotações','');ns.forEach(function(n){L.push('- '+(n.idea?'(aplicar) ':'')+n.text.replace(/\n/g,'\n  ')+(n.sec?' (seção: '+n.sec+')':''))});L.push('')}
+    if(ex){L.push('### Exercício: minha resposta','',ex,'')}});
+  return L.join('\n')}
+function fileStamp(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function download(name,text,type){var b=new Blob([text],{type:type}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1500)}
+function shareOrDownload(base,text,variants){
+  for(var i=0;i<variants.length;i++){try{var f=new File([text],base+variants[i][0],{type:variants[i][1]});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'Caderno Inteligência Pragmática'}).catch(function(){});return}}catch(e){}}
+  download(base+variants[0][0],text,variants[0][1]);toast('Arquivo baixado')}
+function copyText(text){function fb(){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);
+    ta.focus();ta.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();toast(ok?'Copiado. Agora é só colar na conversa.':'Não consegui copiar. Use o botão de arquivo.')}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){toast('Copiado. Agora é só colar na conversa.')},fb);else fb()}
+function importJSON(txt){var o=JSON.parse(txt),d=o&&(o.state||o),added=0,k,ids={};if(!d||typeof d!=='object')throw new Error('formato');
+  S.notes.forEach(function(n){ids[n.id]=1});S.hl.forEach(function(h){ids[h.id]=1});
+  (d.notes||[]).forEach(function(n){if(n&&n.id&&typeof n.text==='string'&&!ids[n.id]){S.notes.push({id:String(n.id),ch:String(n.ch||''),sec:String(n.sec||''),text:n.text,idea:!!n.idea,ts:+n.ts||Date.now()});added++}});
+  (d.hl||[]).forEach(function(h){if(h&&h.id&&Array.isArray(h.parts)&&!ids[h.id]){S.hl.push({id:String(h.id),ch:String(h.ch||''),note:String(h.note||''),idea:!!h.idea,ts:+h.ts||Date.now(),
+    parts:h.parts.filter(function(p){return p&&typeof p.t==='string'}).map(function(p){return{b:+p.b||0,s:+p.s||0,e:+p.e||0,t:p.t}})});added++}});
+  for(k in (d.ex||{}))if(!S.ex[k]&&typeof d.ex[k]==='string'){S.ex[k]=d.ex[k];added++}
+  for(k in (d.read||{}))if(!S.read[k])S.read[k]=+d.read[k]||Date.now();
+  for(k in (d.fav||{}))S.fav[k]=1;
+  save();return added}
+
+/* --- tela "Meu caderno" --- */
+function renderNotebook(keep){var y=window.scrollY;cur=null;view='nb';document.body.classList.remove('reading');setMarking(false);
+  var c=counts(),h='',empty=!c.hl&&!c.notes&&!c.ex;
+  h+='<section class="cover nb"><p class="eyebrow">Meu caderno</p><h1>Anotações e destaques</h1><p class="tagline">'+plural(c.hl,'destaque','destaques')+' · '+plural(c.notes,'anotação','anotações')+
+     ' · '+plural(c.ex,'exercício','exercícios')+' · '+plural(c.ideas,'ideia pra aplicar','ideias pra aplicar')+'</p>'+
+     '<div class="overall"><p><b>Exportar.</b> "Copiar tudo" gera um texto pronto pra colar na conversa com o Claude. Tudo aqui fica salvo só neste aparelho, então faça backup de vez em quando.</p>'+
+     '<div class="exp"><button class="btn primary" id="x-copy">Copiar tudo</button><button class="btn" id="x-share">Salvar ou enviar arquivo</button>'+
+     '<button class="btn" id="x-json">Backup (.json)</button><button class="btn" id="x-imp">Restaurar backup</button></div>'+
+     '<input type="file" id="x-file" accept=".json,application/json" hidden></div>'+
+     '<button class="btn nb-add" id="nb-add">+ Anotação geral (sem capítulo)</button></section>';
+  if(empty)h+='<p class="empty" style="margin-top:24px">Seu caderno está vazio. Durante a leitura: selecione um trecho e toque em "Destacar", use o lápis da barra pra anotar, marque "ideia pra aplicar" no que for virar ação, e responda os exercícios no fim de cada capítulo.</p>';
+  var ideasN=S.notes.filter(function(n){return n.idea}),ideasH=S.hl.filter(function(x){return x.idea});
+  if(ideasN.length||ideasH.length)h+='<h2 class="sec">Ideias pra aplicar</h2><ul class="notes">'+ideasN.map(function(n){return noteItemHTML(n,true)}).join('')+ideasH.map(function(x){return hlItemHTML(x,true)}).join('')+'</ul>';
+  [''].concat(CH.map(function(x){return x.id})).forEach(function(id){
+    var hs=S.hl.filter(function(x){return (x.ch||'')===id}),ns=S.notes.filter(function(n){return (n.ch||'')===id}),ex=id&&S.ex[id];
+    if(!hs.length&&!ns.length&&!ex)return;
+    h+='<h2 class="sec">'+(id?'<a href="#/c/'+esc(id)+'">'+esc(chName(id))+' →</a>':'Geral')+'</h2>';
+    if(ex)h+='<div class="nb-ex"><small>Exercício: minha resposta</small><p>'+esc(ex)+'</p></div>';
+    h+='<ul class="notes">'+hs.map(function(x){return hlItemHTML(x)}).join('')+ns.map(function(n){return noteItemHTML(n)}).join('')+'</ul>'});
+  app.innerHTML=h;bindItems(app);
+  $('#nb-add').onclick=function(){openSheet({kind:'new',ch:'',sec:''})};
+  $('#x-copy').onclick=function(){copyText(exportMD())};
+  $('#x-share').onclick=function(){shareOrDownload('caderno-inteligencia-pragmatica-'+fileStamp(),exportMD(),[['.md','text/markdown'],['.txt','text/plain']])};
+  $('#x-json').onclick=function(){shareOrDownload('backup-inteligencia-pragmatica-'+fileStamp(),JSON.stringify({app:'inteligencia-pragmatica',v:1,exported:new Date().toISOString(),state:S},null,1),[['.json','application/json'],['.txt','text/plain']])};
+  var fi=$('#x-file');$('#x-imp').onclick=function(){fi.click()};
+  fi.onchange=function(){var f=fi.files&&fi.files[0];if(!f)return;var rd=new FileReader();
+    rd.onload=function(){try{var n=importJSON(String(rd.result));renderNotebook();toast('Backup restaurado · '+plural(n,'item novo','itens novos'))}catch(e){toast('Arquivo inválido. Use o .json gerado pelo botão Backup.')}};rd.readAsText(f)};
+  bar.innerHTML='<b>Meu caderno</b>';document.title='Meu caderno · Inteligência Pragmática';prog.style.width='0';document.body.classList.remove('bar-hidden');
+  window.scrollTo(0,keep?y:0)}
+
+
 /* rotas */
-function route(){closeDrawer();aa.classList.remove('open');var m=location.hash.match(/^#\/c\/([\w-]+)/);if(m)renderChapter(m[1]);else renderHome()}
+function route(){closeDrawer();aa.classList.remove('open');if(sheetOpen)closeSheet();selbar.classList.remove('show');setMarking(false);
+  var m=location.hash.match(/^#\/c\/([\w-]+)(?:\?h=(\w+))?/);
+  if(m)renderChapter(m[1],m[2]);else if(/^#\/notas/.test(location.hash))renderNotebook();else renderHome()}
 window.addEventListener('hashchange',route);
 applyTheme();applyFs();route();
 

@@ -20,6 +20,8 @@ WPM = 180  # leitura com pausa pra tabela e caixa
 
 book = json.loads((SRC / "book.json").read_text(encoding="utf-8"))
 shell = (SRC / "shell.html").read_text(encoding="utf-8")
+shell = shell.replace("/*NOTES_CSS*/", (SRC / "notes.css").read_text(encoding="utf-8"))
+shell = shell.replace("/*NOTES_JS*/", (SRC / "notes.js").read_text(encoding="utf-8"))
 
 TRIGGER_RE = re.compile(r'<div class="box trigger">(.*?)</div>', re.S)
 TABLE_RE = re.compile(r'<div class="table-wrap">.*?</div>', re.S)

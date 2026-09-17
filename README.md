@@ -10,6 +10,8 @@ Um manual de bolso para ver o que é, decidir sem drama e fazer o que funciona.
 - Tabelas, caixas de ideia central, armadilhas, exemplos e 47 gatilhos no formato "se X, então Y"
 - Barra de leitura, tempo restante, check de capítulo lido, progresso geral
 - Estrela nos gatilhos: os favoritos aparecem na capa, em "Meus gatilhos"
+- Caderno embutido: destaque de trechos (selecionando texto ou no modo marcador), anotações por capítulo, resposta dos exercícios, marcação "ideia pra aplicar"
+- Exportação do caderno em Markdown (copiar ou arquivo) e backup/restauração em JSON
 - Modo claro e escuro, tamanho de letra ajustável
 - Funciona sem internet depois da primeira abertura (PWA)
 
@@ -26,6 +28,7 @@ O progresso fica salvo só no aparelho (localStorage). Nada é enviado pra servi
 chapters/NN-slug.html   um fragmento HTML por capítulo
 src/book.json           sumário (ordem, títulos, partes)
 src/shell.html          o app (layout, tema, progresso)
+src/notes.js / .css     caderno: destaques, anotações, exportação (incluídos no shell pelo build)
 src/SPEC.md             regras de voz e componentes
 python3 build.py        junta tudo em index.html e carimba o cache do sw.js
 ```

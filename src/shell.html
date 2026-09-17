@@ -27,6 +27,7 @@ document.documentElement.setAttribute('data-theme',t)})();
   --warn-bg:#fbe6e1;--warn-bd:#c8452f;--warn-t:#9a2e1c;
   --ex-bg:#e5eef8;--ex-bd:#3b78b8;--ex-t:#275a8e;
   --ask-bg:#efe9f7;--ask-bd:#7a5bb0;--ask-t:#5a3f8c;
+  --hl:#ffe58a;--hl-bd:#c99700;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --fs:18px;
@@ -40,6 +41,7 @@ document.documentElement.setAttribute('data-theme',t)})();
   --warn-bg:#2c1815;--warn-bd:#d0604a;--warn-t:#f09a88;
   --ex-bg:#14202d;--ex-bd:#4c8bcb;--ex-t:#8fbdea;
   --ask-bg:#1f1a2b;--ask-bd:#8d70c4;--ask-t:#bda6e6;
+  --hl:#57460f;--hl-bd:#e6bf5e;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--bar-h) + 12px)}
@@ -210,6 +212,7 @@ details.install li{margin:6px 0}
 @media (min-width:760px){:root{--fs:19px}.table-wrap{margin-left:0;margin-right:0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media print{#bar,#progress,.ch-end,#drawer,#scrim,.fav{display:none!important}main{padding-top:0}}
+/*NOTES_CSS*/
 </style>
 </head>
 <body>
@@ -218,6 +221,8 @@ details.install li{margin:6px 0}
 <header id="bar">
   <button class="ib" id="b-menu" aria-label="Abrir sumário"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
   <div id="bar-label"><b>Inteligência Pragmática</b></div>
+  <button class="ib rd" id="b-mark" aria-label="Marcador: tocar num trecho pra destacar" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-9.5 9.5H6v-4.5z"/><path d="M4 21.5h16"/></svg></button>
+  <button class="ib rd" id="b-note" aria-label="Nova anotação"><svg viewBox="0 0 24 24"><path d="M5 4h14v11l-5 5H5z"/><path d="M14 20v-5h5"/><path d="M8.5 9h7M8.5 12.5h4"/></svg></button>
   <button class="ib txt" id="b-aa" aria-label="Tamanho da letra e tema" aria-expanded="false">Aa</button>
   <button class="ib" id="b-theme" aria-label="Alternar modo claro e escuro">
     <svg class="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
@@ -236,6 +241,14 @@ details.install li{margin:6px 0}
 <aside id="drawer" aria-label="Sumário" aria-hidden="true"></aside>
 
 <main id="app"><noscript>Este livro precisa de JavaScript ligado para funcionar.</noscript></main>
+<div id="selbar"><button id="sel-hl">Destacar</button><button id="sel-note">Destacar + nota</button></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title" hidden><div class="sh-card">
+  <h3 id="sh-title"></h3>
+  <div id="sh-quote" hidden></div>
+  <textarea id="sh-text" rows="5"></textarea>
+  <label class="sh-idea"><input type="checkbox" id="sh-idea"> Ideia pra aplicar na prática</label>
+  <div class="sh-actions"><button id="sh-del">Excluir</button><span></span><button id="sh-cancel">Cancelar</button><button id="sh-save" class="primary">Salvar</button></div>
+</div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <!--TEMPLATES-->
@@ -248,8 +261,9 @@ var CH=BOOK.chapters, PARTS=BOOK.parts;
 var LS='ip.state.v1';
 var FS=[16,17,18,19.5,21,23];
 var S=load();
-function load(){var d={read:{},pos:{},last:null,theme:'auto',fs:2,fav:{}};
-  try{var o=JSON.parse(localStorage.getItem(LS)||'{}');for(var k in o)d[k]=o[k]}catch(e){}return d}
+function load(){var d={read:{},pos:{},last:null,theme:'auto',fs:2,fav:{},notes:[],hl:[],ex:{}};
+  try{var o=JSON.parse(localStorage.getItem(LS)||'{}');for(var k in o)d[k]=o[k]}catch(e){}
+  if(!Array.isArray(d.notes))d.notes=[];if(!Array.isArray(d.hl))d.hl=[];if(!d.ex||typeof d.ex!=='object')d.ex={};return d}
 function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 var $=function(s,r){return (r||document).querySelector(s)};
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
@@ -257,7 +271,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;
 var app=$('#app'),bar=$('#bar-label'),prog=$('#progress span'),drawer=$('#drawer');
 var CHECK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 var STAR='<svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8z"/></svg>';
-var cur=null,openedAt=0,io=null;
+var cur=null,openedAt=0,io=null,view='home',marking=false;
 
 /* índice de gatilhos (texto por id) */
 var TRIG={};
@@ -301,13 +315,14 @@ function setRead(id,v,quiet){if(v)S.read[id]=Date.now();else delete S.read[id];s
   if(!quiet){var s=stats();toast(v?'Capítulo concluído · '+s.n+' de '+s.total:'Desmarcado')}}
 function bindToc(root){root.addEventListener('click',function(e){var b=e.target.closest('.chk');if(!b)return;
   var id=b.parentNode.getAttribute('data-id');setRead(id,!S.read[id]);refresh()})}
-function refresh(){if(cur===null)renderHome(true);else{var d=$('.done');if(d)paintDone(d)}
+function refresh(){if(view==='home')renderHome(true);else if(view==='nb')renderNotebook(true);else{var d=$('.done');if(d)paintDone(d)}
   if(document.body.classList.contains('drawer-open'))renderDrawer()}
 
 /* gaveta */
 function renderDrawer(){var s=stats();
   drawer.innerHTML='<header><a href="#/">Inteligência Pragmática</a><button class="ib" id="d-close" aria-label="Fechar sumário"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>'+
   '<div class="dmeter"><div class="meter"><span style="width:'+s.pct+'%"></span></div>'+s.n+' de '+s.total+' capítulos · '+s.pct+'%</div>'+
+  '<a class="dlink" href="#/notas">Meu caderno · anotações e exportação</a>'+
   '<nav class="toc">'+tocHTML()+'</nav>';
   $('#d-close').onclick=closeDrawer}
 function openDrawer(){renderDrawer();document.body.classList.add('drawer-open');drawer.setAttribute('aria-hidden','false');
@@ -316,8 +331,8 @@ function closeDrawer(){document.body.classList.remove('drawer-open');drawer.setA
 $('#b-menu').onclick=openDrawer;$('#scrim').onclick=closeDrawer;bindToc(drawer);
 drawer.addEventListener('click',function(e){if(e.target.closest('a'))closeDrawer()});
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){closeDrawer();aa.classList.remove('open')}
-  if(cur!==null&&!e.metaKey&&!e.ctrlKey&&!e.altKey){var i=idx(cur);
+  if(e.key==='Escape'){closeDrawer();aa.classList.remove('open');if(sheetOpen)closeSheet()}
+  if(cur!==null&&!sheetOpen&&!/TEXTAREA|INPUT/.test(e.target.tagName)&&!e.metaKey&&!e.ctrlKey&&!e.altKey){var i=idx(cur);
     if(e.key==='ArrowRight'&&CH[i+1])location.hash='#/c/'+CH[i+1].id;
     if(e.key==='ArrowLeft'&&CH[i-1])location.hash='#/c/'+CH[i-1].id}});
 
@@ -326,7 +341,7 @@ function favsHTML(){var ks=Object.keys(S.fav).filter(function(k){return TRIG[k]}
   if(!ks.length)return '<p class="empty">Toque na estrela de um gatilho durante a leitura e ele aparece aqui, pra você reler todo dia.</p>';
   return '<div class="favs">'+ks.map(function(k){var c=CH[idx(TRIG[k].ch)];
     return '<div class="box trigger" data-tid="'+k+'"><p>'+TRIG[k].html+'</p><span class="from"><a href="#/c/'+c.id+'">Cap. '+esc(c.num)+' · '+esc(c.title)+'</a></span></div>'}).join('')+'</div>'}
-function renderHome(keep){cur=null;var s=stats(),y=window.scrollY;
+function renderHome(keep){cur=null;view='home';document.body.classList.remove('reading');setMarking(false);var s=stats(),nc=counts(),y=window.scrollY;
   var nxt=null;if(S.last&&!S.read[S.last]&&idx(S.last)>=0)nxt=CH[idx(S.last)];
   if(!nxt)nxt=CH.filter(function(c){return !S.read[c.id]})[0]||null;
   var started=s.n>0||S.last;
@@ -336,44 +351,47 @@ function renderHome(keep){cur=null;var s=stats(),y=window.scrollY;
     '<p class="tagline">'+esc(BOOK.tagline)+'</p>'+
     '<div class="overall"><div class="meter"><span style="width:'+s.pct+'%"></span></div><p><b>'+s.n+' de '+s.total+'</b> capítulos lidos · '+s.pct+'%'+(s.left?' · faltam ~'+mins(s.left):'')+'</p>'+cta+'</div></section>'+
     '<h2 class="sec">Meus gatilhos</h2>'+favsHTML()+
+    '<h2 class="sec">Meu caderno</h2><a class="nbcard" href="#/notas"><b>'+plural(nc.hl,'destaque','destaques')+' · '+plural(nc.notes,'anotação','anotações')+' · '+plural(nc.ideas,'ideia pra aplicar','ideias pra aplicar')+'</b><span>Abrir, revisar e exportar →</span></a>'+
     '<nav class="toc" id="home-toc">'+tocHTML()+'</nav>'+
     '<details class="install"><summary>Instalar como app no celular</summary><ol>'+
     '<li><b>iPhone (Safari):</b> botão Compartilhar, depois "Adicionar à Tela de Início".</li>'+
     '<li><b>Android (Chrome):</b> menu de três pontos, depois "Instalar app" ou "Adicionar à tela inicial".</li>'+
-    '<li>Depois de aberto uma vez, o livro funciona sem internet. Seu progresso fica salvo neste aparelho.</li></ol></details>'+
+    '<li>Depois de aberto uma vez, o livro funciona sem internet. Progresso, destaques e anotações ficam salvos só neste aparelho (o app instalado e o navegador guardam separado). Faça backup pelo Meu caderno.</li></ol></details>'+
     '<p class="foot">Texto original, escrito com IA e revisado. Conceitos creditados aos autores citados.<br><button id="reset">Zerar meu progresso</button></p>';
   bindToc($('#home-toc'));
   var rb=$('#reset'),armed=false;rb.onclick=function(){if(!armed){armed=true;rb.textContent='Toque de novo pra confirmar';setTimeout(function(){armed=false;rb.textContent='Zerar meu progresso'},4000);return}
-    S.read={};S.pos={};S.last=null;save();renderHome();toast('Progresso zerado')};
+    S.read={};S.pos={};S.last=null;save();renderHome();toast('Progresso zerado. Anotações e destaques foram mantidos.')};
   bar.innerHTML='<b>Inteligência Pragmática</b>';document.title='Inteligência Pragmática';prog.style.width='0';
   document.body.classList.remove('bar-hidden');
   window.scrollTo(0,keep?y:0)}
 
 /* capítulo */
 function paintDone(b){var r=!!S.read[cur];b.setAttribute('aria-pressed',String(r));b.innerHTML=r?'✓ Lido <small>· toque pra desmarcar</small>':'Marcar capítulo como lido'}
-function renderChapter(id){var i=idx(id);if(i<0){location.replace('#/');return}
-  var c=CH[i],tpl=document.getElementById('ch-'+id);cur=id;openedAt=Date.now();S.last=id;save();
+function renderChapter(id,focusH){var i=idx(id);if(i<0){location.replace('#/');return}
+  var c=CH[i],tpl=document.getElementById('ch-'+id);cur=id;view='ch';document.body.classList.add('reading');openedAt=Date.now();S.last=id;save();
   var prev=CH[i-1],next=CH[i+1];
   app.innerHTML='<header class="ch-head"><p class="eyebrow">'+esc(PARTS[c.part])+'</p><h1>'+esc(c.title)+'</h1>'+
     (c.sub?'<p class="sub">'+esc(c.sub)+'</p>':'')+
     '<p class="meta"><span>Capítulo '+esc(c.num)+' · '+mins(c.min)+' de leitura</span>'+(S.read[id]?'<span class="pill">✓ lido</span>':'')+'</p></header>'+
-    '<article id="content"></article>'+
+    '<article id="content"></article><section id="ch-notes"></section>'+
     '<footer class="ch-end"><button class="btn done"></button><div class="pn">'+
     (prev?'<a class="btn" href="#/c/'+prev.id+'"><small>← Anterior</small>'+esc(prev.title)+'</a>':'<span class="ph"></span>')+
     (next?'<a class="btn next" href="#/c/'+next.id+'"><small>Próximo →</small>'+esc(next.title)+'</a>':'<a class="btn next" href="#/"><small>Fim →</small>Voltar à capa</a>')+
     '</div></footer>';
-  var art=$('#content');art.appendChild(tpl.content.cloneNode(true));
+  var art=$('#content');art.appendChild(tpl.content.cloneNode(true));indexBlocks(art);
   $$('.box.trigger[data-tid]',art).forEach(function(b){var k=b.getAttribute('data-tid'),btn=document.createElement('button');
     btn.className='fav';btn.innerHTML=STAR;btn.setAttribute('aria-label','Salvar em Meus gatilhos');btn.setAttribute('aria-pressed',String(!!S.fav[k]));
     btn.onclick=function(){if(S.fav[k])delete S.fav[k];else S.fav[k]=1;save();
       $$('.box.trigger[data-tid="'+k+'"] .fav',art).forEach(function(x){x.setAttribute('aria-pressed',String(!!S.fav[k]))});
       toast(S.fav[k]?'Salvo em Meus gatilhos (na capa)':'Removido de Meus gatilhos')};
     b.appendChild(btn)});
+  chapterExtras(art,id);
   var d=$('.done');paintDone(d);d.onclick=function(){setRead(id,!S.read[id]);paintDone(d)};
   document.title=c.title+' · Inteligência Pragmática';
   window.scrollTo(0,0);
-  var p=S.pos[id]||0;
-  if(p>.03&&p<.97)requestAnimationFrame(function(){requestAnimationFrame(function(){window.scrollTo(0,p*maxScroll())})});
+  var p=S.pos[id]||0,fm=focusH?$('mark[data-h="'+focusH+'"]',art):null;
+  if(fm)setTimeout(function(){fm.scrollIntoView({block:'center'});$$('mark[data-h="'+focusH+'"]',art).forEach(function(m){m.classList.add('flash')})},60);
+  else if(p>.03&&p<.97)requestAnimationFrame(function(){requestAnimationFrame(function(){window.scrollTo(0,p*maxScroll())})});
   if(io)io.disconnect();
   if('IntersectionObserver' in window){io=new IntersectionObserver(function(es){es.forEach(function(e){
     if(e.isIntersecting&&cur===id&&!S.read[id]&&Date.now()-openedAt>40000){setRead(id,true);paintDone(d)}})},{threshold:.6});io.observe(d)}
@@ -388,13 +406,17 @@ function onScroll(){tick=false;var y=window.scrollY;
     var c=CH[idx(cur)],left=Math.ceil(c.min*(1-r));
     bar.innerHTML='<b>'+esc(c.num)+' · '+esc(c.title)+'</b> · '+(r>=.995?'fim':Math.round(r*100)+'% · '+left+' min');
     S.pos[cur]=Math.max(0,Math.min(1,y/maxScroll()));clearTimeout(sv);sv=setTimeout(save,350);
-    if(y>lastY+6&&y>140)document.body.classList.add('bar-hidden');else if(y<lastY-6||y<140)document.body.classList.remove('bar-hidden')}
+    if(!marking&&y>lastY+6&&y>140)document.body.classList.add('bar-hidden');else if(y<lastY-6||y<140)document.body.classList.remove('bar-hidden')}
   lastY=y}
 window.addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});
 window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',function(){if(document.hidden)save()});
 
+/*NOTES_JS*/
+
 /* rotas */
-function route(){closeDrawer();aa.classList.remove('open');var m=location.hash.match(/^#\/c\/([\w-]+)/);if(m)renderChapter(m[1]);else renderHome()}
+function route(){closeDrawer();aa.classList.remove('open');if(sheetOpen)closeSheet();selbar.classList.remove('show');setMarking(false);
+  var m=location.hash.match(/^#\/c\/([\w-]+)(?:\?h=(\w+))?/);
+  if(m)renderChapter(m[1],m[2]);else if(/^#\/notas/.test(location.hash))renderNotebook();else renderHome()}
 window.addEventListener('hashchange',route);
 applyTheme();applyFs();route();
 
